@@ -4,7 +4,6 @@ import { lightBlue } from '../constants/color';
 import moment from 'moment';
 import { fileFormat } from '../../lib/features';
 import RenderAttachment from './RenderAttachment';
-import { animate, motion } from 'framer-motion';
 
 const MessageComponent = ({ message, user }) => {
     const { sender, content, attachment = [], createdAt } = message;
