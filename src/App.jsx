@@ -8,6 +8,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { userExists, userNotExists } from "./redux/reducers/auth";
 import { Toaster } from 'react-hot-toast'
 import { SocketProvider } from "./socket";
+import { messaging } from './firebase/firebase'
+import { getToken } from "firebase/messaging";
+import { current } from "@reduxjs/toolkit";
 
 const Home = lazy(() => import("./pages/Home"));
 const Login = lazy(() => import("./pages/Login"));
@@ -25,12 +28,39 @@ const App = () => {
 
   const { user } = useSelector(state => state.auth);
   const dispatch = useDispatch();
+
   useEffect(() => {
     axios
       .get(`${server}/api/v1/user/me`, {withCredentials: true})
       .then(({ data }) => dispatch(userExists(data.user)))
       .catch((err) => dispatch(userNotExists()));
   }, [dispatch])
+
+  useEffect(() => {
+    if(user) {
+      Notification.requestPermission().then((permission) => {
+        console.log(permission);
+        if (permission === 'granted') {
+          console.log("permission granted");
+          getToken(messaging, {vapidKey: "BEvcuu81vqC2grRNhZdaoEf_tebfUcjmYLL4uxZrYqb_iY6XpSE6q1AjLaFL6OeCmuXMryM9b0LHJOCVKAaQY0I"}).then((currentToken) => {
+            if (currentToken) {
+              axios
+                .post(`${server}/api/v1/user/savetoken`, {token: currentToken, user: user}, {withCredentials: true})
+                .then(console.log("Token saved successfully"))
+                .catch((err) => console.log(err));
+            } else {
+              // Show permission request UI
+              console.log('No registration token available. Request permission to generate one.');
+              // ...
+            }
+          }).catch((err) => {
+            console.log('An error occurred while retrieving token. ', err);
+            // ...
+          });
+        }
+      });
+    }
+  }, [user]);
 
   return (
     <BrowserRouter>

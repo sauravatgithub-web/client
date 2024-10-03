@@ -2,7 +2,6 @@ import React, { memo } from 'react';
 import { Link } from '../styles/StyledComponents';
 import { Box, Stack, Typography } from '@mui/material';
 import AvatarCard from './AvatarCard';
-import { motion } from 'framer-motion';
 
 const ChatItem = ({
     index = 0, 
@@ -15,7 +14,6 @@ const ChatItem = ({
     sameSender,
     handleDeleteChat
 }) => {
-    console.log(newMessageAlert);
     return (
         <Link 
             sx={{ padding: "0" }}
